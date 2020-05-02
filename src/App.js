@@ -1,38 +1,33 @@
 import React, {Component} from 'react';
 import './App.css';
+import NavBar from "./NavBar";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import Home from "./Home";
+import CoffeeShopsList from "./CoffeeShopsList";
+import Api from "./Api";
+import CoffeeShopsEdit from "./CoffeeShopsEdit";
+
+const api = new Api();
 
 class App extends Component {
-    state = {
-        isLoading: true,
-        coffeeShops: []
-    };
-    async componentDidMount() {
-        const response = await fetch('/api/coffeeshops');
-        const body = await response.json();
-        this.setState({
-            coffeeShops: body._embedded.coffeeshops,
-            isLoading: false
-        });
-    }
+
     render() {
-        const {coffeeShops, isLoading} = this.state;
-        if (isLoading) {
-            return <p>Loading...</p>;
-        }
+        const navbar = <NavBar/>;
         return (
-            <div className="App">
-                <header className="App-header">
-                    <div className="App-intro">
-                        <h2>Coffee Shop List</h2>
-                        {coffeeShops.map(coffeeShop =>
-                            <div key={coffeeShop.id}>
-                                {coffeeShop.name} - {coffeeShop.address}
-                            </div>
-                        )}
-                    </div>
-                </header>
-            </div>
-        );
+            <Router>
+               <Switch>
+                   <Route path='/' exact={true}
+                          render={(props) => <Home {...props} api={api} navbar={navbar}/>}
+                   />
+                   <Route path='/coffee-shops' exact={true}
+                          render={(props) => <CoffeeShopsList {...props} api={api} navbar={navbar}/>}
+                   />
+                   <Route path='/coffee-shops/:id'
+                          render={(props) => <CoffeeShopsEdit {...props} api={api} navbar={navbar}/>}
+                   />
+               </Switch>
+            </Router>
+        )
     }
 }
 
